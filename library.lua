@@ -51,7 +51,7 @@ function Library:Notify(title, text, duration)
     Tl.Position = UDim2.new(0, 10, 0, 5)
     Tl.TextColor3 = Color3.fromRGB(0, 255, 150)
     Tl.Font = Enum.Font.GothamBold
-    Tl.TextSize = 18 -- Küçültüldü
+    Tl.TextSize = 18 
     Tl.BackgroundTransparency = 1
     Tl.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -61,7 +61,7 @@ function Library:Notify(title, text, duration)
     Tx.Position = UDim2.new(0, 10, 0, 35)
     Tx.TextColor3 = Color3.fromRGB(255, 255, 255)
     Tx.Font = Enum.Font.Gotham
-    Tx.TextSize = 14 -- Küçültüldü
+    Tx.TextSize = 14 
     Tx.BackgroundTransparency = 1
     Tx.TextXAlignment = Enum.TextXAlignment.Left
     Tx.TextWrapped = true
@@ -79,7 +79,7 @@ function Library.Window(title)
     ScreenGui.Name = "YunusLoLib"
     
     local Main = Instance.new("Frame", ScreenGui)
-    Main.Size = UDim2.new(0, 580, 0, 380) -- Panel boyutu normale çekildi
+    Main.Size = UDim2.new(0, 580, 0, 380)
     Main.Position = UDim2.new(0.5, -290, 0.5, -190)
     Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
@@ -96,18 +96,18 @@ function Library.Window(title)
     Title.Size = UDim2.new(1, 0, 0, 60)
     Title.Text = title
     Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 20 -- Başlık küçültüldü
+    Title.TextSize = 21 -- BAŞLIK ŞİMDİ TAM 21 PUNTO
     Title.BackgroundTransparency = 1
     RunService.RenderStepped:Connect(function() 
         Title.TextColor3 = Color3.fromHSV(tick()%5/5, 0.6, 1) 
     end)
 
     local Tog = Instance.new("TextButton", ScreenGui)
-    Tog.Size = UDim2.new(0, 130, 0, 45) -- Açma butonu dengelendi
+    Tog.Size = UDim2.new(0, 130, 0, 45)
     Tog.Position = UDim2.new(0, 50, 0, 50)
     Tog.Text = "Toggle GUI"
     Tog.Font = Enum.Font.GothamBold
-    Tog.TextSize = 18 -- Yazı küçültüldü
+    Tog.TextSize = 18 
     Tog.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     Tog.TextColor3 = Color3.fromRGB(255, 255, 255)
     Instance.new("UICorner", Tog).CornerRadius = UDim.new(0, 8)
@@ -146,7 +146,7 @@ function Library.Window(title)
         TBtn.Text = name
         TBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
         TBtn.Font = Enum.Font.GothamBold
-        TBtn.TextSize = 16 -- Sekme yazısı küçültüldü
+        TBtn.TextSize = 16 
         Instance.new("UICorner", TBtn).CornerRadius = UDim.new(0, 6)
 
         if TabLogic.First then 
@@ -166,12 +166,12 @@ function Library.Window(title)
 
         function Elements:CreateButton(txt, cb)
             local B = Instance.new("TextButton", Page)
-            B.Size = UDim2.new(1, -10, 0, 42) -- Buton boyutu dengelendi
+            B.Size = UDim2.new(1, -10, 0, 42)
             B.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
             B.Text = txt
             B.TextColor3 = Color3.fromRGB(255,255,255)
             B.Font = Enum.Font.GothamBold
-            B.TextSize = 18 -- Buton yazısı küçültüldü
+            B.TextSize = 18 
             Instance.new("UICorner", B).CornerRadius = UDim.new(0, 6)
             B.MouseButton1Click:Connect(cb)
         end
@@ -185,7 +185,7 @@ function Library.Window(title)
             T.TextColor3 = Color3.fromRGB(200,200,200)
             T.TextXAlignment = Enum.TextXAlignment.Left
             T.Font = Enum.Font.GothamBold
-            T.TextSize = 17 -- Toggle yazısı küçültüldü
+            T.TextSize = 17 
             Instance.new("UICorner", T).CornerRadius = UDim.new(0, 6)
             
             local Box = Instance.new("Frame", T)
@@ -215,7 +215,7 @@ function Library.Window(title)
             L.BackgroundTransparency = 1
             L.TextXAlignment = Enum.TextXAlignment.Left
             L.Font = Enum.Font.GothamBold
-            L.TextSize = 16 -- Slider yazısı küçültüldü
+            L.TextSize = 16 
             
             local Bar = Instance.new("TextButton", S)
             Bar.Size = UDim2.new(1, -20, 0, 8)
