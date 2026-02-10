@@ -34,7 +34,6 @@ local function MakeDraggable(gui)
     end)
 end
 
--- Bildirim Sistemi
 function Library:Notify(title, text, duration)
     local NotifyGui = Instance.new("ScreenGui", CoreGui)
     local NotifyFrame = Instance.new("Frame", NotifyGui)
@@ -96,7 +95,7 @@ function Library.Window(title)
     Title.Size = UDim2.new(1, 0, 0, 60)
     Title.Text = title
     Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 21 -- BAŞLIK ŞİMDİ TAM 21 PUNTO
+    Title.TextSize = 21
     Title.BackgroundTransparency = 1
     RunService.RenderStepped:Connect(function() 
         Title.TextColor3 = Color3.fromHSV(tick()%5/5, 0.6, 1) 
