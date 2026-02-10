@@ -131,13 +131,19 @@ function Library.Window(title)
     local TabLogic = {First = true}
 
     function TabLogic:CreateTab(name)
+        -- SAYFA AYARLARI (OTOMATİK UZAMA EKLENDİ)
         local Page = Instance.new("ScrollingFrame", Container)
         Page.Size = UDim2.new(1, 0, 1, 0)
         Page.BackgroundTransparency = 1
         Page.Visible = false
-        Page.ScrollBarThickness = 0
+        Page.ScrollBarThickness = 2 -- Kaydırma için kalınlaştırıldı
+        Page.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 150)
+        Page.CanvasSize = UDim2.new(0, 0, 0, 0)
+        Page.AutomaticCanvasSize = Enum.AutomaticSize.Y -- Element eklendikçe aşağı uzar
+        
         local Layout = Instance.new("UIListLayout", Page)
         Layout.Padding = UDim.new(0, 10)
+        Layout.SortOrder = Enum.SortOrder.LayoutOrder
 
         local TBtn = Instance.new("TextButton", TabHolder)
         TBtn.Size = UDim2.new(0, 140, 0, 38)
