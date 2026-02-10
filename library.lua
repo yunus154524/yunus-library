@@ -96,7 +96,7 @@ function Library.Window(title)
     Title.Size = UDim2.new(1, 0, 0, 60)
     Title.Text = title
     Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 24 -- Başlık küçültüldü
+    Title.TextSize = 20 -- Başlık küçültüldü
     Title.BackgroundTransparency = 1
     RunService.RenderStepped:Connect(function() 
         Title.TextColor3 = Color3.fromHSV(tick()%5/5, 0.6, 1) 
