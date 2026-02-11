@@ -3,7 +3,7 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 
-local Library = {}
+local Library = {}s
 
 -- Sürükleme Fonksiyonu
 local function MakeDraggable(gui)
