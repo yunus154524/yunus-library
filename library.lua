@@ -5,6 +5,7 @@ local CoreGui = game:GetService("CoreGui")
 
 local Library = {}
 
+-- Sürükleme Fonksiyonu
 local function MakeDraggable(gui)
     local dragging, dragInput, dragStart, startPos
     gui.InputBegan:Connect(function(input)
@@ -26,6 +27,33 @@ local function MakeDraggable(gui)
     end)
 end
 
+-- Bildirim Sistemi (Notify Hatası Çözüldü)
+function Library:Notify(title, text, duration)
+    local NotifyGui = Instance.new("ScreenGui", CoreGui)
+    local NotifyFrame = Instance.new("Frame", NotifyGui)
+    NotifyFrame.Size = UDim2.new(0, 260, 0, 85)
+    NotifyFrame.Position = UDim2.new(1, -270, 1, 100)
+    NotifyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Instance.new("UICorner", NotifyFrame).CornerRadius = UDim.new(0, 8)
+    local s = Instance.new("UIStroke", NotifyFrame)
+    s.Color = Color3.fromRGB(0, 255, 150)
+
+    local Tl = Instance.new("TextLabel", NotifyFrame)
+    Tl.Text = title; Tl.Size = UDim2.new(1, -20, 0, 30); Tl.Position = UDim2.new(0, 10, 0, 5)
+    Tl.TextColor3 = Color3.fromRGB(0, 255, 150); Tl.Font = Enum.Font.GothamBold; Tl.TextSize = 18; Tl.BackgroundTransparency = 1; Tl.TextXAlignment = Enum.TextXAlignment.Left
+
+    local Tx = Instance.new("TextLabel", NotifyFrame)
+    Tx.Text = text; Tx.Size = UDim2.new(1, -20, 0, 40); Tx.Position = UDim2.new(0, 10, 0, 35)
+    Tx.TextColor3 = Color3.fromRGB(255, 255, 255); Tx.Font = Enum.Font.Gotham; Tx.TextSize = 14; Tx.BackgroundTransparency = 1; Tx.TextXAlignment = Enum.TextXAlignment.Left; Tx.TextWrapped = true
+
+    NotifyFrame:TweenPosition(UDim2.new(1, -270, 1, -95), "Out", "Quart", 0.5, true)
+    task.delay(duration or 3, function()
+        NotifyFrame:TweenPosition(UDim2.new(1, -270, 1, 100), "In", "Quart", 0.5, true)
+        task.wait(0.5)
+        NotifyGui:Destroy()
+    end)
+end
+
 function Library.Window(title)
     local ScreenGui = Instance.new("ScreenGui", CoreGui)
     ScreenGui.Name = "YunusLoLib"
@@ -35,22 +63,16 @@ function Library.Window(title)
     Main.Position = UDim2.new(0.5, -290, 0.5, -190)
     Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
-    local Stroke = Instance.new("UIStroke", Main)
-    Stroke.Color = Color3.fromRGB(45, 45, 45); Stroke.Thickness = 2
+    local Stroke = Instance.new("UIStroke", Main); Stroke.Color = Color3.fromRGB(45, 45, 45); Stroke.Thickness = 2
     MakeDraggable(Main)
 
     local LeftPanel = Instance.new("Frame", Main)
     LeftPanel.Size = UDim2.new(0, 160, 1, 0); LeftPanel.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
     Instance.new("UICorner", LeftPanel).CornerRadius = UDim.new(0, 12)
 
-    local Title = Instance.new("TextLabel", LeftPanel)
-    Title.Size = UDim2.new(1, 0, 0, 60); Title.Text = title; Title.Font = Enum.Font.GothamBold; Title.TextSize = 21; Title.BackgroundTransparency = 1
-    RunService.RenderStepped:Connect(function() Title.TextColor3 = Color3.fromHSV(tick()%5/5, 0.6, 1) end)
-
-    local Tog = Instance.new("TextButton", ScreenGui)
-    Tog.Size = UDim2.new(0, 130, 0, 45); Tog.Position = UDim2.new(0, 50, 0, 50); Tog.Text = "Toggle GUI"; Tog.Font = Enum.Font.GothamBold; Tog.TextSize = 18; Tog.BackgroundColor3 = Color3.fromRGB(20, 20, 20); Tog.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Instance.new("UICorner", Tog).CornerRadius = UDim.new(0, 8); MakeDraggable(Tog)
-    Tog.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
+    local TitleLbl = Instance.new("TextLabel", LeftPanel)
+    TitleLbl.Size = UDim2.new(1, 0, 0, 60); TitleLbl.Text = title; TitleLbl.Font = Enum.Font.GothamBold; TitleLbl.TextSize = 21; TitleLbl.BackgroundTransparency = 1
+    RunService.RenderStepped:Connect(function() TitleLbl.TextColor3 = Color3.fromHSV(tick()%5/5, 0.6, 1) end)
 
     local Container = Instance.new("Frame", Main)
     Container.Size = UDim2.new(1, -180, 1, -20); Container.Position = UDim2.new(0, 170, 0, 10); Container.BackgroundTransparency = 1
@@ -72,7 +94,7 @@ function Library.Window(title)
         TBtn.Size = UDim2.new(0, 140, 0, 38); TBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TBtn.Text = name; TBtn.TextColor3 = Color3.fromRGB(200, 200, 200); TBtn.Font = Enum.Font.GothamBold; TBtn.TextSize = 16
         Instance.new("UICorner", TBtn).CornerRadius = UDim.new(0, 6)
 
-        if TabLogic.First then Page.Visible = true; TBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45); TabLogic.First = false end
+        if self.First then Page.Visible = true; TBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45); self.First = false end
 
         TBtn.MouseButton1Click:Connect(function()
             for _, v in pairs(Container:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end
@@ -81,16 +103,13 @@ function Library.Window(title)
 
         local Elements = {}
 
-        -- [YENİ] Section Oluşturma
         function Elements:CreateSection(txt)
             local SFrame = Instance.new("Frame", Page)
             SFrame.Size = UDim2.new(1, -10, 0, 30); SFrame.BackgroundTransparency = 1
             local SLbl = Instance.new("TextLabel", SFrame)
             SLbl.Text = txt; SLbl.Size = UDim2.new(1, 0, 1, 0); SLbl.TextColor3 = Color3.fromRGB(0, 255, 150); SLbl.Font = "GothamBold"; SLbl.TextSize = 15; SLbl.BackgroundTransparency = 1; SLbl.TextXAlignment = "Left"
-            local Line = Instance.new("Frame", SFrame); Line.Size = UDim2.new(1, 0, 0, 1); Line.Position = UDim2.new(0, 0, 1, 0); Line.BackgroundColor3 = Color3.fromRGB(45, 45, 45); Line.BorderSizePixel = 0
         end
 
-        -- [YENİ] Label Oluşturma
         function Elements:CreateLabel(txt)
             local L = Instance.new("TextLabel", Page)
             L.Size = UDim2.new(1, -10, 0, 25); L.Text = txt; L.TextColor3 = Color3.fromRGB(200, 200, 200); L.Font = "GothamMedium"; L.TextSize = 14; L.BackgroundTransparency = 1; L.TextXAlignment = "Left"
