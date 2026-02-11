@@ -5,12 +5,14 @@ local CoreGui = game:GetService("CoreGui")
 
 local Library = {}
 
--- Sürükleme Fonksiyonu
+-- [[ SÜRÜKLEME SİSTEMİ ]] --
 local function MakeDraggable(gui)
     local dragging, dragInput, dragStart, startPos
     gui.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true; dragStart = input.Position; startPos = gui.Position
+            dragging = true
+            dragStart = input.Position
+            startPos = gui.Position
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then dragging = false end
             end)
@@ -27,8 +29,10 @@ local function MakeDraggable(gui)
     end)
 end
 
+-- [[ BİLDİRİM SİSTEMİ ]] --
 function Library:Notify(title, text, duration)
     local NotifyGui = Instance.new("ScreenGui", CoreGui)
+    NotifyGui.Name = "YunusLoNotify"
     local NotifyFrame = Instance.new("Frame", NotifyGui)
     NotifyFrame.Size = UDim2.new(0, 260, 0, 85)
     NotifyFrame.Position = UDim2.new(1, -270, 1, 100)
@@ -46,13 +50,19 @@ function Library:Notify(title, text, duration)
 
     NotifyFrame:TweenPosition(UDim2.new(1, -270, 1, -95), "Out", "Quart", 0.5, true)
     task.delay(duration or 3, function()
-        NotifyFrame:TweenPosition(UDim2.new(1, -270, 1, 100), "In", "Quart", 0.5, true)
-        task.wait(0.5)
-        NotifyGui:Destroy()
+        if NotifyFrame then
+            NotifyFrame:TweenPosition(UDim2.new(1, -270, 1, 100), "In", "Quart", 0.5, true)
+            task.wait(0.5)
+            NotifyGui:Destroy()
+        end
     end)
 end
 
+-- [[ PENCERE OLUŞTURMA ]] --
 function Library.Window(title)
+    -- Eski GUI varsa sil (Çakışmayı önler)
+    if CoreGui:FindFirstChild("YunusLoLib") then CoreGui.YunusLoLib:Destroy() end
+
     local ScreenGui = Instance.new("ScreenGui", CoreGui)
     ScreenGui.Name = "YunusLoLib"
     
@@ -71,6 +81,13 @@ function Library.Window(title)
     local TitleLbl = Instance.new("TextLabel", LeftPanel)
     TitleLbl.Size = UDim2.new(1, 0, 0, 60); TitleLbl.Text = title; TitleLbl.Font = Enum.Font.GothamBold; TitleLbl.TextSize = 21; TitleLbl.BackgroundTransparency = 1
     RunService.RenderStepped:Connect(function() TitleLbl.TextColor3 = Color3.fromHSV(tick()%5/5, 0.6, 1) end)
+    
+    local ToggleBtn = Instance.new("TextButton", ScreenGui)
+    ToggleBtn.Name = "Toggle"
+    ToggleBtn.Size = UDim2.new(0, 100, 0, 30); ToggleBtn.Position = UDim2.new(0, 10, 0, 10); ToggleBtn.Text = "Menu"; ToggleBtn.BackgroundColor3 = Color3.fromRGB(30,30,30); ToggleBtn.TextColor3 = Color3.new(1,1,1)
+    Instance.new("UICorner", ToggleBtn)
+    MakeDraggable(ToggleBtn)
+    ToggleBtn.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
 
     local Container = Instance.new("Frame", Main)
     Container.Size = UDim2.new(1, -180, 1, -20); Container.Position = UDim2.new(0, 170, 0, 10); Container.BackgroundTransparency = 1
@@ -79,22 +96,26 @@ function Library.Window(title)
     TabHolder.Size = UDim2.new(1, 0, 1, -70); TabHolder.Position = UDim2.new(0, 0, 0, 65); TabHolder.BackgroundTransparency = 1; TabHolder.ScrollBarThickness = 0
     Instance.new("UIListLayout", TabHolder).HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-    local WindowFunctions = {First = true}
+    -- Bu tabloyu en sonda return edeceğiz
+    local WindowFunctions = { IsFirstTab = true }
 
     function WindowFunctions:CreateTab(name)
-        -- Tab Sayfası (ScrollingFrame)
         local Page = Instance.new("ScrollingFrame", Container)
         Page.Size = UDim2.new(1, 0, 1, 0); Page.BackgroundTransparency = 1; Page.Visible = false; Page.ScrollBarThickness = 2
         Page.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 150); Page.CanvasSize = UDim2.new(0, 0, 0, 0); Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
         
         local PageLayout = Instance.new("UIListLayout", Page); PageLayout.Padding = UDim.new(0, 12); PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-        -- Tab Butonu (Sol Panel)
         local TBtn = Instance.new("TextButton", TabHolder)
         TBtn.Size = UDim2.new(0, 140, 0, 38); TBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); TBtn.Text = name; TBtn.TextColor3 = Color3.fromRGB(200, 200, 200); TBtn.Font = Enum.Font.GothamBold; TBtn.TextSize = 16
         Instance.new("UICorner", TBtn).CornerRadius = UDim.new(0, 6)
 
-        if WindowFunctions.First then Page.Visible = true; TBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45); WindowFunctions.First = false end
+        -- İlk Tab ise göster
+        if WindowFunctions.IsFirstTab then
+            Page.Visible = true
+            TBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            WindowFunctions.IsFirstTab = false
+        end
 
         TBtn.MouseButton1Click:Connect(function()
             for _, v in pairs(Container:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end
@@ -103,41 +124,34 @@ function Library.Window(title)
 
         local TabFunctions = {}
 
-        -- >>> SECTION OLUŞTURMA <<<
+        -- [[ SECTION OLUŞTURMA ]] --
         function TabFunctions:CreateSection(sectionName)
-            -- Section Ana Kutusu (İçine elementler gelecek)
             local SectionContainer = Instance.new("Frame", Page)
-            SectionContainer.Size = UDim2.new(1, -10, 0, 0) -- Yükseklik otomatik artacak
+            SectionContainer.Size = UDim2.new(1, -10, 0, 0) -- Yükseklik otomatikte
             SectionContainer.BackgroundTransparency = 1
-            SectionContainer.AutomaticSize = Enum.AutomaticSize.Y -- İçindekilere göre büyür
+            SectionContainer.AutomaticSize = Enum.AutomaticSize.Y
 
             local SectionLayout = Instance.new("UIListLayout", SectionContainer)
-            SectionLayout.Padding = UDim.new(0, 8)
-            SectionLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            SectionLayout.Padding = UDim.new(0, 8); SectionLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-            -- Section Başlığı
             local TitleFrame = Instance.new("Frame", SectionContainer)
             TitleFrame.Size = UDim2.new(1, 0, 0, 30); TitleFrame.BackgroundTransparency = 1
-            
             local TitleText = Instance.new("TextLabel", TitleFrame)
             TitleText.Text = sectionName; TitleText.Size = UDim2.new(1, 0, 1, 0); TitleText.TextColor3 = Color3.fromRGB(0, 255, 150); TitleText.Font = Enum.Font.GothamBold; TitleText.TextSize = 15; TitleText.BackgroundTransparency = 1; TitleText.TextXAlignment = Enum.TextXAlignment.Left
-
             local Line = Instance.new("Frame", TitleFrame); Line.Size = UDim2.new(1, 0, 0, 1); Line.Position = UDim2.new(0, 0, 1, 0); Line.BackgroundColor3 = Color3.fromRGB(45, 45, 45); Line.BorderSizePixel = 0
 
-            -- ELEMENT FONKSİYONLARI (Artık Section'a bağlı)
             local SectionFunctions = {}
 
             function SectionFunctions:CreateLabel(txt)
                 local L = Instance.new("TextLabel", SectionContainer)
                 L.Size = UDim2.new(1, 0, 0, 25); L.Text = txt; L.TextColor3 = Color3.fromRGB(200, 200, 200); L.Font = Enum.Font.GothamMedium; L.TextSize = 14; L.BackgroundTransparency = 1; L.TextXAlignment = Enum.TextXAlignment.Left
-                return L
             end
 
             function SectionFunctions:CreateButton(txt, cb)
                 local B = Instance.new("TextButton", SectionContainer)
                 B.Size = UDim2.new(1, 0, 0, 42); B.BackgroundColor3 = Color3.fromRGB(35, 35, 35); B.Text = txt; B.TextColor3 = Color3.fromRGB(255,255,255); B.Font = Enum.Font.GothamBold; B.TextSize = 18
-                Instance.new("UICorner", B).CornerRadius = UDim.new(0, 6); B.MouseButton1Click:Connect(cb)
-                return B
+                Instance.new("UICorner", B).CornerRadius = UDim.new(0, 6)
+                B.MouseButton1Click:Connect(cb)
             end
 
             function SectionFunctions:CreateToggle(txt, cb)
@@ -152,7 +166,6 @@ function Library.Window(title)
                     TweenService:Create(Box, TweenInfo.new(0.2), {BackgroundColor3 = s and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(50, 50, 50)}):Play()
                     cb(s)
                 end)
-                return T
             end
 
             function SectionFunctions:CreateSlider(txt, min, max, def, cb)
@@ -169,15 +182,46 @@ function Library.Window(title)
                     end)
                     UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then conn:Disconnect() end end)
                 end)
-                return S
             end
 
-            return SectionFunctions -- Burası önemli: Section'ı değişkene atamana izin verir
+            return SectionFunctions -- SECTION FONSİYONLARINI DÖNDÜR
         end
 
-        return TabFunctions
+        return TabFunctions -- TAB FONKSİYONLARINI DÖNDÜR
     end
-    return WindowFunctions
+
+    return WindowFunctions -- PENCERE FONKSİYONLARINI DÖNDÜR (BU EKSİKTİ!)
 end
 
-return Library
+-- [[ KULLANIM ÖRNEĞİ ]] --
+
+local window = Library.Window("YunusLo Hub Final")
+
+-- Bildirim Testi
+Library:Notify("Hoşgeldin", "Script başarıyla yüklendi!", 5)
+
+-- Tab Oluşturma
+local MainTab = window:CreateTab("Genel")
+local PlayerTab = window:CreateTab("Oyuncu")
+
+-- Section Oluşturma (MainTab içine)
+local FarmSection = MainTab:CreateSection("Farm Ayarları")
+local MiscSection = MainTab:CreateSection("Diğer")
+
+-- Elementler (FarmSection içine)
+FarmSection:CreateToggle("Otomatik Farm", function(state)
+    print("Auto Farm:", state)
+end)
+
+FarmSection:CreateButton("Tıkla Bana", function()
+    Library:Notify("Bilgi", "Butona tıklandı!", 2)
+end)
+
+-- Elementler (MiscSection içine)
+MiscSection:CreateLabel("Bu bir bilgilendirme yazısıdır.")
+MiscSection:CreateSlider("Hız", 16, 200, 16, function(val)
+    print("Hız:", val)
+    if game.Players.LocalPlayer.Character then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = val
+    end
+end)
